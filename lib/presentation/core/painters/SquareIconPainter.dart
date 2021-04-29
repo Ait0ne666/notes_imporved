@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 
 class SquareIconPainter extends CustomPainter {
   final double animation;
   final Color startColor;
   final Color endColor;
+  final ui.Image image;
 
-  SquareIconPainter({this.animation, this.startColor, this.endColor});
+  SquareIconPainter(
+      {this.animation, this.startColor, this.endColor, this.image});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -50,6 +53,20 @@ class SquareIconPainter extends CustomPainter {
                 Size(size.width * 0.6, size.height * 0.6),
             Radius.circular(8)),
         mainPaint);
+
+    if (image != null) {
+      Paint imagePaint = Paint()..color = Colors.white;
+
+      canvas.drawImageRect(
+          image,
+          Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+          Rect.fromLTWH(
+              size.width / 2 - size.width * 0.35 / 2,
+              size.height / 2 - size.height * 0.35 / 2,
+              size.width * 0.35,
+              size.height * 0.35),
+          imagePaint);
+    }
   }
 
   @override

@@ -1,12 +1,27 @@
 import 'dart:math';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
 import 'package:notes_improved/presentation/core/painters/SquareIconPainter.dart';
+import 'package:notes_improved/presentation/core/painters/moonPainter.dart';
 import 'package:notes_improved/presentation/core/painters/notepadPainter.dart';
 import 'package:notes_improved/presentation/core/painters/orangeCircle.dart';
 
 class WelcomeScreen extends StatelessWidget {
+  Future<ui.Image> loadImage(String asset) async {
+    ByteData data = await rootBundle.load(asset);
+
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+
+      // targetWidth: 400
+    );
+    final ui.FrameInfo fi = await codec.getNextFrame();
+
+    return fi.image;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +72,7 @@ class WelcomeScreen extends StatelessWidget {
                     Positioned(
                       child: ClipRect(
                         child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                           child: CustomPaint(
                             painter: NotepadPainter(animation: 0),
                             child: Container(
@@ -72,15 +87,21 @@ class WelcomeScreen extends StatelessWidget {
                     Positioned(
                       bottom: 1,
                       left: 200,
-                      child: CustomPaint(
-                        painter: SquareIconPainter(
-                            animation: 0,
-                            startColor: Color(0xffcaacf8),
-                            endColor: Color(0xff8371f2)),
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                        ),
+                      child: FutureBuilder(
+                        future: loadImage("assets/edit.png"),
+                        builder: (context, data) {
+                          return CustomPaint(
+                            painter: SquareIconPainter(
+                                animation: 0,
+                                startColor: Color(0xffcaacf8),
+                                endColor: Color(0xff8371f2),
+                                image: data.data),
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     Positioned(
@@ -131,6 +152,17 @@ class WelcomeScreen extends StatelessWidget {
                             height: 5,
                           )),
                     ),
+                    Positioned(
+                      top: 0,
+                      left: 15,
+                      child: CustomPaint(
+                        painter: MoonPainter(),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                    )
                   ],
                 ),
               )
